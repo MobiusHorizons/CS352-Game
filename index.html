@@ -92,7 +92,7 @@
 
 				data = generateHeight( worldWidth, worldDepth );
 
-				camera.position.y = data[ worldHalfWidth + worldHalfDepth * worldWidth ] * 10 + 300;
+				camera.position.y = data[ worldHalfWidth + worldHalfDepth * worldWidth ] * 10 + 500;
 
 				var geometry = new THREE.PlaneBufferGeometry( 7500, 7500, worldWidth - 1, worldDepth - 1 );
 				geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
@@ -105,8 +105,15 @@
 
 				}
 
-				texture = new THREE.Texture( generateTexture( data, worldWidth, worldDepth ), THREE.UVMapping, THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping );
-				texture.needsUpdate = true;
+				//texture = new THREE.Texture( generateTexture( data, worldWidth, worldDepth ), THREE.UVMapping, THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping );
+				//texture.needsUpdate = true;
+
+				//Attempt to add rock texture to the terrain.
+				texture = THREE.ImageUtils.loadTexture( 'resources/rock4.jpg');
+				texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+				texture.repeat.set(6,6);
+
+				// turns out the key to correct repeat is to have an image that is exactly powers of two in size (eg 2048x4096)
 
 				//Attempt to add rock texture to the terrain.
 				//There are three pictures, they all look a little wierd, but maybe more interesting thaqn procedural color.
