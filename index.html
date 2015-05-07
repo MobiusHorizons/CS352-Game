@@ -41,16 +41,151 @@
 
 		<script src="js/controls/FirstPersonFlightControls.js"></script>
 		<script src="js/controls/FlyControls.js"></script>
+<<<<<<< HEAD
+=======
+
+>>>>>>> 549c1756f7a107b4aa9372813d8e9c71596340b5
 
 		<script src="js/ImprovedNoise.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
+<<<<<<< HEAD
 		<script src="js/OBJLoader.js"></script>
 		<script src="js/MTLLoader.js"></script>
 		<script src="js/OBJMTLLoader.js"></script>
 		
+=======
+		<script>
+
+			if ( ! Detector.webgl ) {
+
+				Detector.addGetWebGLMessage();
+				document.getElementById( 'container' ).innerHTML = "";
+
+			}
+
+			var container, stats;
+
+			var camera, controls, scene, renderer;
+
+			var mesh, texture;
+
+			var worldWidth = 812, worldDepth = 812,		//modified to 812 instead of 512. I think it looks good still.
+			worldHalfWidth = worldWidth / 2, worldHalfDepth = worldDepth / 2;
+
+			var clock = new THREE.Clock();
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.getElementById( 'container' );
+
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
+
+				//controls = new THREE.FirstPersonFlightControls( camera );
+				//controls.lookSpeed = 0.1;
+				controls 								= new THREE.FlyControls(camera);
+				controls.movementSpeed 	= 100;
+				controls.velocity 			= new THREE.Vector3(0,-1,25);
+				controls.rollSpeed 			=  0.4;
+				controls.dragToLook 		= true;
+				controls.invertControls = true;
+
+				scene = new THREE.Scene();
+				//scene.fog = new THREE.FogExp2( 0xefd1b5, 0.0015 );
+				scene.fog = new THREE.FogExp2(0x8888AA, 0.0015);
+
+				data = generateHeight( worldWidth, worldDepth );
+
+				camera.position.y = data[ worldHalfWidth + worldHalfDepth * worldWidth ] * 10 + 500;
+
+				var geometry = new THREE.PlaneBufferGeometry( 7500, 7500, worldWidth - 1, worldDepth - 1 );
+				geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
+
+				var vertices = geometry.attributes.position.array;
+
+				for ( var i = 0, j = 0, l = vertices.length; i < l; i ++, j += 3 ) {
+
+					vertices[ j + 1 ] = data[ i ] * 10;
+
+				}
+
+				//texture = new THREE.Texture( generateTexture( data, worldWidth, worldDepth ), THREE.UVMapping, THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping );
+				//texture.needsUpdate = true;
+
+				//Attempt to add rock texture to the terrain.
+				texture = THREE.ImageUtils.loadTexture( 'resources/rock4.jpg');
+				texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+				texture.repeat.set(6,6);
+
+				// turns out the key to correct repeat is to have an image that is exactly powers of two in size (eg 2048x4096)
+
+				//Attempt to add rock texture to the terrain.
+				//There are three pictures, they all look a little wierd, but maybe more interesting thaqn procedural color.
+				//var Rocktexture = THREE.ImageUtils.loadTexture( "resources/rock3.jpg" );
+				//Rocktexture.wrapS = THREE.ClampToEdgeWrapping;
+				//Rocktexture.wrapT = THREE.ClampToEdgeWrapping;
+				//Rocktexture.repeat.set( 2, 2 );
+
+
+
+				mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { map: texture } ) );
+				scene.add( mesh );
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setClearColor( 0x7799ff );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				container.innerHTML = "";
+
+				container.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				container.appendChild( stats.domElement );
+
+
+				//adding skybox code.
+
+
+        // urls of the images,
+        // one per half axis
+        var urls = [
+              'resources/pos-x.png',
+              'resources/neg-x.png',
+              'resources/pos-y.png',
+              'resources/neg-y.png',
+              'resources/pos-z.png',
+              'resources/neg-z.png'
+            ];
+
+        // wrap it up into the object that we need
+        var cubemap = THREE.ImageUtils.loadTextureCube(urls);
+
+        // set the format, likely RGB
+        // unless you've gone crazy
+        //cubemap.format = THREE.RGBFormat;
+
+        // following code from https://github.com/mrdoob/three.js/blob/master/examples/webgl_materials_cubemap.html
+        var shader = THREE.ShaderLib[ "cube" ];
+        shader.uniforms[ "tCube" ].value = cubemap;
+
+        var skyBoxMaterial = new THREE.ShaderMaterial( {
+
+          fragmentShader: shader.fragmentShader,
+          vertexShader: shader.vertexShader,
+          uniforms: shader.uniforms,
+          depthWrite: false,
+		//added from example, makes walls show up.
+		side: THREE.BackSide
+
+>>>>>>> 549c1756f7a107b4aa9372813d8e9c71596340b5
 
 
 		<script src="js/setup.js"></script>
