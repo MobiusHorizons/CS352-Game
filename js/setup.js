@@ -10,6 +10,8 @@
 			var camera, controls, scene, renderer;
 
 			var mesh, texture;
+			//for collision detection.
+			var plane;
 
 			var worldWidth = 812, worldDepth = 812,		//modified to 812 instead of 512. I think it looks good still.
 			worldHalfWidth = worldWidth / 2, worldHalfDepth = worldDepth / 2;
@@ -153,11 +155,15 @@
 			function loadModel(){
 
 				var oLoader = new THREE.OBJMTLLoader();
-				oLoader.load('model/eurofighter.obj', 'model/eurofighter.mtl', function(object) {
+				oLoader.load('model/TY-444.obj', 'model/TY-444.mtl', function(object) {
 
 					camera.add(object);
-					object.rotation.x = 180;
-					object.position.set(0, -10, -8);
+					//object.rotation.x = 45;
+					object.rotation.y = 14.85;
+					//object.rotation.z =45;
+					object.position.set(0, -5, -15);
+					//for collision detection.
+					plane = object;
 					});
 					
 			}
@@ -273,6 +279,8 @@
 
 				render();
 				stats.update();
+			//attempt at collision detection!
+				//checkForCollision();
 
 			}
 
@@ -283,3 +291,23 @@
 				renderer.render( scene, camera );
 
 			}
+/*
+//attempt at collision detection!
+			function checkForCollision(){
+
+				for (var vertexIndex = 0; vertexIndex < plane.geometry.vertices.length; vertexIndex++){       
+				    var localVertex = plane.geometry.vertices[vertexIndex].clone();
+				    var globalVertex = plane.matrix.multiplyVector3(localVertex);
+				    var directionVector = globalVertex.subSelf( plane.position );
+				    var ray = new THREE.Ray( player.position, directionVector.clone().normalize() );
+				    var collisionResults = ray.intersectObjects( mesh );
+				    if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ) {
+						// a collision occurred... do something...
+						//what will indicate?
+						plane.rotation.x += 5;
+				    }
+				}
+
+			}
+
+*/
