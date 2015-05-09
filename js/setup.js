@@ -38,7 +38,7 @@
 
 				scene = new THREE.Scene();
 				//scene.fog = new THREE.FogExp2( 0xefd1b5, 0.0015 );
-				scene.fog = new THREE.FogExp2(0x8888AA, 0.0010);				
+				scene.fog = new THREE.FogExp2(0x8888AA, 0.0010);
 
 				//added directional light.
 
@@ -58,12 +58,12 @@
 
 				var vertices = geometry.attributes.position.array;
 
+
 				for ( var i = 0, j = 0, l = vertices.length; i < l; i ++, j += 3 ) {
 
 					vertices[ j + 1 ] = data[ i ] * 10;
 
 				}
-
 				//texture = new THREE.Texture( generateTexture( data, worldWidth, worldDepth ), THREE.UVMapping, THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping );
 				//texture.needsUpdate = true;
 
@@ -82,6 +82,8 @@
 
 
 				mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { map: texture } ) );
+				terrain = mesh;
+
 				scene.add( mesh );
 
 				renderer = new THREE.WebGLRenderer();
@@ -100,8 +102,8 @@
 
 
 				//adding skybox code.
- 
-      
+
+
         // urls of the images,
         // one per half axis
         var urls = [
@@ -132,7 +134,7 @@
           depthWrite: false,
 		//added from example, makes walls show up.
 		side: THREE.BackSide
-		
+
 
         });
 
@@ -145,12 +147,12 @@
 			//attempt to add plane model for nose cone.
 			// prepare loader and load the model
 		this.loadModel();
-			
+
 				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
 
-			
+
 
 			function loadModel(){
 
@@ -158,17 +160,27 @@
 				oLoader.load('model/TY-444.obj', 'model/TY-444.mtl', function(object) {
 
 					camera.add(object);
-					//object.rotation.x = 45;
-					object.rotation.y = 14.85;
+					//object.rotation.x = 0.1;
+					//object.rotation.y = 14.85;
+					object.rotation.y = 2.24;
 					//object.rotation.z =45;
-					object.position.set(0, -5, -15);
+					object.position.set(0, -1.3, -7);
+					object.rotation.set(.1,2.36,0);
 					//for collision detection.
 					plane = object;
 					});
-					
-			}
-			
 
+			}
+
+			function aboveTerrain(object){
+				var raycaster = new THREE.Raycaster();
+				raycaster.set(object.getWorldPosition(), new THREE.Vector3(0,-1, 0));
+				var intersections = raycaster.intersectObject(terrain, false);
+				if (intersections.length > 0){
+					return intersections[0].distance;
+				}
+				return -1;
+			}
 
 
 			function onWindowResize() {
@@ -295,7 +307,7 @@
 //attempt at collision detection!
 			function checkForCollision(){
 
-				for (var vertexIndex = 0; vertexIndex < plane.geometry.vertices.length; vertexIndex++){       
+				for (var vertexIndex = 0; vertexIndex < plane.geometry.vertices.length; vertexIndex++){
 				    var localVertex = plane.geometry.vertices[vertexIndex].clone();
 				    var globalVertex = plane.matrix.multiplyVector3(localVertex);
 				    var directionVector = globalVertex.subSelf( plane.position );
