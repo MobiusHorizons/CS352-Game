@@ -44,7 +44,7 @@
 
 				controls = new THREE.FlyControls(camera, planeGroup);
 				controls.movementSpeed 	= 100;
-				controls.velocity 			= new THREE.Vector3(0,0,0);
+				controls.velocity 			= new THREE.Vector3(0,0,25);
 				controls.rollSpeed 			=  0.7;
 				controls.dragToLook 		= true;
 				controls.invertControls = true;
