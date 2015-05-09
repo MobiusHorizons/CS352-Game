@@ -17,9 +17,13 @@
 			worldHalfWidth = worldWidth / 2, worldHalfDepth = worldDepth / 2;
 
 			var clock = new THREE.Clock();
-
-			init();
-			animate();
+			//attempt to add plane model for nose cone.
+			// prepare loader and load the model
+			this.loadModel(function(obj){
+				plane = obj;
+				init();
+				animate();
+			});
 
 			function init() {
 
@@ -29,10 +33,19 @@
 
 				//controls = new THREE.FirstPersonFlightControls( camera );
 				//controls.lookSpeed = 0.1;
-				controls = new THREE.FlyControls(camera);
+				var planeGroup = new THREE.Object3D();
+
+				plane.rotation.set(.1,2.36,0);
+				plane.position.set(0, -2 ,-7);
+				planeGroup.add(plane);
+
+
+				planeGroup.add(camera);
+
+				controls = new THREE.FlyControls(camera, planeGroup);
 				controls.movementSpeed 	= 100;
-				controls.velocity 			= new THREE.Vector3(0,-1,25);
-				controls.rollSpeed 			=  0.4;
+				controls.velocity 			= new THREE.Vector3(0,0,0);
+				controls.rollSpeed 			=  0.7;
 				controls.dragToLook 		= true;
 				controls.invertControls = true;
 
@@ -42,17 +55,15 @@
 
 				//added directional light.
 
-				var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
+				var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
 				directionalLight.position.set( 0, 1, 0 );
 				scene.add( directionalLight );
 
-
+				scene.add(planeGroup);
 
 				data = generateHeight( worldWidth, worldDepth );
 
-				camera.position.y = data[ worldHalfWidth + worldHalfDepth * worldWidth ] * 10 + 300;
-				scene.add(camera);
-
+				planeGroup.position.y = data[ worldHalfWidth + worldHalfDepth * worldWidth ] * 10 + 300;
 				var geometry = new THREE.PlaneBufferGeometry( 7500, 7500, worldWidth - 1, worldDepth - 1 );
 				geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
 
@@ -144,32 +155,25 @@
 	 scene.add(skybox);
 
 
-			//attempt to add plane model for nose cone.
-			// prepare loader and load the model
-		this.loadModel();
-
 				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
 
 
 
-			function loadModel(){
+			function loadModel(cb){
 
 				var oLoader = new THREE.OBJMTLLoader();
 				oLoader.load('model/TY-444.obj', 'model/TY-444.mtl', function(object) {
+						//object.rotation.x = 0.1;
+						//object.rotation.y = 14.85;
 
-					camera.add(object);
-					//object.rotation.x = 0.1;
-					//object.rotation.y = 14.85;
-					object.rotation.y = 2.24;
-					//object.rotation.z =45;
-					object.position.set(0, -1.3, -7);
-					object.rotation.set(.1,2.36,0);
-					//for collision detection.
-					plane = object;
-					});
-
+						//for collision detection.
+						plane = object;
+						if (cb){
+							cb(object);
+						}
+				});
 			}
 
 			function aboveTerrain(object){
