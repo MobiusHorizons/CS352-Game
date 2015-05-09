@@ -187,16 +187,7 @@
 			}
 
 
-			function onWindowResize() {
-
-				camera.aspect = window.innerWidth / window.innerHeight;
-				camera.updateProjectionMatrix();
-
-				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				controls.handleResize();
-
-			}
+			
 
 			function generateHeight( width, height ) {
 
@@ -296,7 +287,7 @@
 				render();
 				stats.update();
 			//attempt at collision detection!
-				//checkForCollision();
+				checkForCollision();
 
 			}
 
@@ -307,23 +298,40 @@
 				renderer.render( scene, camera );
 
 			}
-/*
-//attempt at collision detection!
-			function checkForCollision(){
 
-				for (var vertexIndex = 0; vertexIndex < plane.geometry.vertices.length; vertexIndex++){
-				    var localVertex = plane.geometry.vertices[vertexIndex].clone();
-				    var globalVertex = plane.matrix.multiplyVector3(localVertex);
-				    var directionVector = globalVertex.subSelf( plane.position );
-				    var ray = new THREE.Ray( player.position, directionVector.clone().normalize() );
-				    var collisionResults = ray.intersectObjects( mesh );
-				    if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ) {
-						// a collision occurred... do something...
-						//what will indicate?
-						plane.rotation.x += 5;
-				    }
-				}
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				controls.handleResize();
 
 			}
 
+//attempt at collision detection!
+			function checkForCollision(){
+
+				if(aboveTerrain(plane) <= -1){
+					//collision!!!
+					plane.rotation.x += 5; //causes you to flip around when you fly through things
+					//camera.rotation.y = 180; //makes you turn around and fly the other way.
+					//controls.velocity.z = controls.velocity.z * -1; //causes you to fly backwards when you hit things.				
+/* feeble attempt to display a "game over" screen by drawing a box in front of the camera with a plane exploding image as a texture.	
+				 var img = THREE.ImageUtils.loadTexture('resources/Plane_Crash.png');
+				img.wrapS = img.wrapT = THREE.RepeatWrapping;
+				img.repeat.set(6,6);
+				var cube = new THREE.Mesh(new THREE.BoxGeometry(200, 200, 200), img);
+				
+				      cube.overdraw = true;
+				      camera.add(cube);
+					cube.position = new THREE.Vector3(0,0,0);
 */
+				
+					
+				
+				}
+
+
+			}
