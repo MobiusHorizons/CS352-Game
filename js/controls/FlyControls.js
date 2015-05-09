@@ -2,9 +2,10 @@
  * @author James Baicoianu / http://www.baicoianu.com/
  */
 
-THREE.FlyControls = function ( object, domElement ) {
+THREE.FlyControls = function ( camera, plane, domElement ) {
 
-	this.object = object;
+	this.object = plane;
+	this.camera = camera;
 
 	this.domElement = ( domElement !== undefined ) ? domElement : document;
 	if ( domElement ) this.domElement.setAttribute( 'tabindex', -1 );
@@ -233,8 +234,11 @@ THREE.FlyControls = function ( object, domElement ) {
 		deltaP.copy(this.velocity).normalize().negate();
 
 		this.object.translateOnAxis(deltaP, this.velocity.length()*deltaT* 7);
+		deltaV.multiplyScalar(7);
+		this.camera.position.set(deltaV.x,deltaV.y,deltaV.z);
 
 		this.tmpQuaternion.set( this.rotationVector.x * rotMult, this.rotationVector.y * rotMult, this.rotationVector.z * rotMult, 1 ).normalize();
+		this.camera.rotation.set(this.rotationVector.x * -1 * rotMult, this.rotationVector.y * -1 * rotMult,this.rotationVector.z * -1 * rotMult)
 		this.object.quaternion.multiply( this.tmpQuaternion );
 
 		// expose the rotation vector for convenience
@@ -263,7 +267,7 @@ THREE.FlyControls = function ( object, domElement ) {
 		this.rotationVector.z = ( -this.moveState.rollRight + this.moveState.rollLeft );
 
 		//console.log( 'rotate:', [ this.rotationVector.x, this.rotationVector.y, this.rotationVector.z ] );
-		console.log(this.moveState);
+		//console.log(this.moveState);
 
 	};
 
