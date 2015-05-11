@@ -11,7 +11,7 @@ Collision.init = function(vertices, pixWidth, pixHeight, width, height){
 
 Collision.collides = function(pos, radius){
   var h  = Collision.getHeight(pos);
-  return (h && h <= 0)
+  return (!h || h <= 0)
 }
 /*
   var clock = new THREE.Clock();
