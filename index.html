@@ -6,12 +6,12 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
-				color: #61443e;
+				color: #black;
 				font-family:Monospace;
 				font-size:13px;
 				text-align:center;
 
-				background-color: #efd1b5;
+				background-color: #99f;
 				margin: 0px;
 				overflow: hidden;
 			}
@@ -26,12 +26,33 @@
 
 				color: #a06851;
 			}
+			#game-over {
+				text-align: center;
+				position: absolute;
+				top: 0px;
+				width: 100%;
+				padding-top: 15%;
+				color: white;
+				font-size: 100pt;
+			}
+
+			#game-over .continue{
+				font-size: 40pt;
+			}
+
+			.hidden{
+				display:none;
+			}
 
 		</style>
 	</head>
 	<body>
 
-		<div id="container"><br /><br /><br /><br /><br />Generating world...</div>
+		<div id="game-over" class="hidden">
+			Game Over
+			<br /> <span class="continue">Pless Any key to restart</span>
+		</div>
+		<div id="container"><br /><br /><br /><br /><br />Loading...</div>
 		<div id="info">
 			Acceleration	<span id="Accel"> 0 </span> m/s^2 <br />
 			AirSpeed:     <span id="Velocity">0 </span> knots <br />

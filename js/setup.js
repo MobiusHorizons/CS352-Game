@@ -8,16 +8,15 @@
 			var container, stats;
 
 			var camera, controls, scene, renderer;
-
 			var mesh, texture;
+			var gameOver = false;
 			//for collision detection.
 			var plane, planeGroup;
-			var raycaster = new THREE.Raycaster();
 
 			var worldWidth = 812, worldDepth = 812,		//modified to 812 instead of 512. I think it looks good still.
 			worldHalfWidth = worldWidth / 2, worldHalfDepth = worldDepth / 2;
 
-			var clock = new THREE.Clock();
+			var clock;
 			//attempt to add plane model for nose cone.
 			// prepare loader and load the model
 			this.loadModel(function(obj){
@@ -27,6 +26,8 @@
 			});
 
 			function init() {
+
+				this.clock = new THREE.Clock();
 
 				container = document.getElementById( 'container' );
 
@@ -271,7 +272,7 @@
 			//
 
 			function animate() {
-
+				if (gameOver) return;
 				requestAnimationFrame( animate );
 
 				render();
@@ -305,28 +306,34 @@
 
 				if(Collision.collides(planeGroup.position)){
 					//collision!!!
-					plane.rotation.x += 5; //causes you to flip around when you fly through things
-					plane.position.z = -20
-					planeGroup.position.z -= 20;
-					controls.velocity = new THREE.Vector3(0,0,0);
-					//camera.rotation.y = 180; //makes you turn around and fly the other way.
-					//controls.velocity.z = controls.velocity.z * -1; //causes you to fly backwards when you hit things.
-// feeble attempt to display a "game over" screen by drawing a box in front of the camera with a plane exploding image as a texture.
-				var img = document.createElement('img');
-	 		  img.src = 'resources/Plane_Crash.png';
-				document.replase
-				img.wrapS = img.wrapT = THREE.RepeatWrapping;
-				// img.repeat.set(6,6);
-				var m = THREE.Mesh(new THREE.PlaneGeometry(100,100,1,1), img);
-				camera.add(m);
-				m.position.z = -10;
-				// var cube = new THREE.Mesh(new THREE.BoxGeometry(200, 200, 200), img);
+					//plane.rotation.x += 5; //causes you to flip around when you fly through things
+					gameOver = true;
+					var time = 0;
+					var ms = 1000/60;
+					var intervalID;
 
-				  //    cube.overdraw = true;
-				   //   camera.add(cube);
-					//cube.position = new THREE.Vector3(0,0,0);
+					var animateGameOver = function(){
+						//console.log(plane.position);
+						if (plane.position.z > -20){
+							var delta = (20.7 - plane.position.z)/2 * ms/1000;
+							plane.position.z -= delta;
+							planeGroup.position.z += delta;
+							renderer.render(scene, camera);
+						} else if(intervalID){
+							clearInterval(intervalID);
+						}
+					};
 
+					intervalID = setInterval(animateGameOver, ms);
+
+					document.getElementById("game-over").classList.remove('hidden');
+					function restart(e){
+						gameOver = false;
+						document.getElementById("game-over").classList.add('hidden');
+						e.target.removeEventListener('keydown', restart, false);
+						window.location.reload();
+					}
+
+					window.addEventListener('keydown', restart, false);
 				}
-
-
 			}
