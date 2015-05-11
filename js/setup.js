@@ -11,7 +11,8 @@
 
 			var mesh, texture;
 			//for collision detection.
-			var plane;
+			var plane, planeGroup;
+			var raycaster = new THREE.Raycaster();
 
 			var worldWidth = 812, worldDepth = 812,		//modified to 812 instead of 512. I think it looks good still.
 			worldHalfWidth = worldWidth / 2, worldHalfDepth = worldDepth / 2;
@@ -29,11 +30,11 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 5000 );
 
 				//controls = new THREE.FirstPersonFlightControls( camera );
 				//controls.lookSpeed = 0.1;
-				var planeGroup = new THREE.Object3D();
+				planeGroup = new THREE.Object3D();
 
 				plane.rotation.set(.1,2.36,0);
 				plane.position.set(0, -2 ,-7);
@@ -51,9 +52,9 @@
 
 				scene = new THREE.Scene();
 				//scene.fog = new THREE.FogExp2( 0xefd1b5, 0.0015 );
-				scene.fog = new THREE.FogExp2(0x8888AA, 0.0010);
+				scene.fog = new THREE.FogExp2(0x8888AA, 0.0015);
 
-				//added directional light.
+				//added directional light
 
 				var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
 				directionalLight.position.set( 0, 1, 0 );
@@ -63,7 +64,7 @@
 
 				data = generateHeight( worldWidth, worldDepth );
 
-				planeGroup.position.y = data[ worldHalfWidth + worldHalfDepth * worldWidth ] * 10 + 300;
+				planeGroup.position.y = data[ worldHalfWidth + worldHalfDepth * worldWidth ] * 10 + 500;
 				var geometry = new THREE.PlaneBufferGeometry( 7500, 7500, worldWidth - 1, worldDepth - 1 );
 				geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
 
@@ -75,6 +76,8 @@
 					vertices[ j + 1 ] = data[ i ] * 10;
 
 				}
+
+				Collision.init(vertices, 7500,7500, worldWidth, worldDepth);
 				//texture = new THREE.Texture( generateTexture( data, worldWidth, worldDepth ), THREE.UVMapping, THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping );
 				//texture.needsUpdate = true;
 
@@ -176,19 +179,6 @@
 				});
 			}
 
-			function aboveTerrain(object){
-				var raycaster = new THREE.Raycaster();
-				raycaster.set(object.getWorldPosition(), new THREE.Vector3(0,-1, 0));
-				var intersections = raycaster.intersectObject(terrain, false);
-				if (intersections.length > 0){
-					return intersections[0].distance;
-				}
-				return -1;
-			}
-
-
-			
-
 			function generateHeight( width, height ) {
 
 				var size = width * height, data = new Uint8Array( size ),
@@ -286,8 +276,6 @@
 
 				render();
 				stats.update();
-			//attempt at collision detection!
-				checkForCollision();
 
 			}
 
@@ -295,6 +283,8 @@
 			function render() {
 
 				controls.update( clock.getDelta() );
+				//attempt at collision detection!
+				checkForCollision();
 				renderer.render( scene, camera );
 
 			}
@@ -313,24 +303,29 @@
 //attempt at collision detection!
 			function checkForCollision(){
 
-				if(aboveTerrain(plane) <= -1){
+				if(Collision.collides(planeGroup.position)){
 					//collision!!!
 					plane.rotation.x += 5; //causes you to flip around when you fly through things
+					plane.position.z = -20
+					planeGroup.position.z -= 20;
+					controls.velocity = new THREE.Vector3(0,0,0);
 					//camera.rotation.y = 180; //makes you turn around and fly the other way.
-					//controls.velocity.z = controls.velocity.z * -1; //causes you to fly backwards when you hit things.				
-/* feeble attempt to display a "game over" screen by drawing a box in front of the camera with a plane exploding image as a texture.	
-				 var img = THREE.ImageUtils.loadTexture('resources/Plane_Crash.png');
+					//controls.velocity.z = controls.velocity.z * -1; //causes you to fly backwards when you hit things.
+// feeble attempt to display a "game over" screen by drawing a box in front of the camera with a plane exploding image as a texture.
+				var img = document.createElement('img');
+	 		  img.src = 'resources/Plane_Crash.png';
+				document.replase
 				img.wrapS = img.wrapT = THREE.RepeatWrapping;
-				img.repeat.set(6,6);
-				var cube = new THREE.Mesh(new THREE.BoxGeometry(200, 200, 200), img);
-				
-				      cube.overdraw = true;
-				      camera.add(cube);
-					cube.position = new THREE.Vector3(0,0,0);
-*/
-				
-					
-				
+				// img.repeat.set(6,6);
+				var m = THREE.Mesh(new THREE.PlaneGeometry(100,100,1,1), img);
+				camera.add(m);
+				m.position.z = -10;
+				// var cube = new THREE.Mesh(new THREE.BoxGeometry(200, 200, 200), img);
+
+				  //    cube.overdraw = true;
+				   //   camera.add(cube);
+					//cube.position = new THREE.Vector3(0,0,0);
+
 				}
 
 
