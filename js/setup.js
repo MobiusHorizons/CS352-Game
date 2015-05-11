@@ -314,16 +314,20 @@
 					var time = 0;
 					var ms = 1000/60;
 					var intervalID;
+					var distance = 0;
 
 					var animateGameOver = function(){
 						//console.log(plane.position);
-						if (plane.position.z > -20){
-							var delta = (20.7 - plane.position.z)/2 * ms/1000;
-							plane.position.z -= delta;
-							planeGroup.position.z += delta;
+						if (distance > -20){
+							var delta = (20.7 - distance)/2 * ms/1000;
+							distance -= delta;
+							plane.position.z = distance;
+							//plane.translateZ(-1* delta);
+							planeGroup.translateZ(delta);
 							renderer.render(scene, camera);
 						} else if(intervalID){
 							clearInterval(intervalID);
+							window.addEventListener('keydown', restart, false);
 						}
 					};
 
@@ -336,7 +340,5 @@
 						e.target.removeEventListener('keydown', restart, false);
 						window.location.reload();
 					}
-
-					window.addEventListener('keydown', restart, false);
 				}
 			}
