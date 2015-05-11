@@ -21,27 +21,32 @@
 			// prepare loader and load the model
 			this.loadModel(function(obj){
 				plane = obj;
-				init();
-				animate();
+				init(function(){
+					animate();
+				});
 			});
 
-			function init() {
+			function init(cb) {
 
 				this.clock = new THREE.Clock();
-
 				container = document.getElementById( 'container' );
+				var ready = 0;
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 5000 );
+				var localCB = function(){
+					console.log(ready);
+					ready ++;
+					if (ready == 2){
+						container.appendChild( renderer.domElement );
+						cb();
+					}
+				};
 
-				//controls = new THREE.FirstPersonFlightControls( camera );
-				//controls.lookSpeed = 0.1;
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
+
 				planeGroup = new THREE.Object3D();
-
 				plane.rotation.set(.1,2.36,0);
 				plane.position.set(0, -2 ,-7);
 				planeGroup.add(plane);
-
-
 				planeGroup.add(camera);
 
 				controls = new THREE.FlyControls(camera, planeGroup);
@@ -57,8 +62,8 @@
 
 				//added directional light
 
-				var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
-				directionalLight.position.set( 0, 1, 0 );
+				var directionalLight = new THREE.DirectionalLight( 0xffffff, 2 );
+				directionalLight.position.set( 0, 1000, 0 );
 				scene.add( directionalLight );
 
 				scene.add(planeGroup);
@@ -79,11 +84,9 @@
 				}
 
 				Collision.init(vertices, 7500,7500, worldWidth, worldDepth);
-				//texture = new THREE.Texture( generateTexture( data, worldWidth, worldDepth ), THREE.UVMapping, THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping );
-				//texture.needsUpdate = true;
 
 				//Attempt to add rock texture to the terrain.
-				texture = THREE.ImageUtils.loadTexture( 'resources/rock4.jpg');
+				texture = THREE.ImageUtils.loadTexture( 'resources/rock4.jpg', {}, localCB);
 				texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 				texture.repeat.set(6,6);
 
@@ -108,7 +111,7 @@
 
 				container.innerHTML = "";
 
-				container.appendChild( renderer.domElement );
+
 
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
@@ -131,7 +134,7 @@
             ];
 
         // wrap it up into the object that we need
-        var cubemap = THREE.ImageUtils.loadTextureCube(urls);
+        var cubemap = THREE.ImageUtils.loadTextureCube(urls, {}, localCB);
 
         // set the format, likely RGB
         // unless you've gone crazy
